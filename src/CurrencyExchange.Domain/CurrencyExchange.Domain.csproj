@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="4q-dev.ResultSharp" Version="1.0.19" />
+    <PackageReference Include="4q-dev.ResultSharp.HttpResult" Version="1.0.1" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+bin
+bin/
+/bin
+obj
+obj/
+/obj
+.vs
+/vs
+vs/
+appsettings.Development.json
+/appsettings.Development.json
+appsettings.Development.json/
