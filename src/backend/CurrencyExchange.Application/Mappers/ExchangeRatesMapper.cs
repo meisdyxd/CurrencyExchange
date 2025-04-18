@@ -1,4 +1,4 @@
-﻿using CurrencyExchange.Application.DTOs.ExchangeRatesDTOs;
+using CurrencyExchange.Application.DTOs.ExchangeRatesDTOs;
 using CurrencyExchange.Domain.Models;
 
 namespace CurrencyExchange.Application.Mappers
@@ -7,7 +7,7 @@ namespace CurrencyExchange.Application.Mappers
     {
         public static ExchangeRatesResponse MapToDto(this ExchangeRates exchangeRates)
         {
-            return new ExchangeRatesResponse(exchangeRates.Id, exchangeRates.BaseCurrency, exchangeRates.TargetCurrency, exchangeRates.Rate);
+            return new ExchangeRatesResponse(exchangeRates.Id, exchangeRates.BaseCurrency.MapToDto(), exchangeRates.TargetCurrency.MapToDto(), exchangeRates.Rate);
         }
         /*public static ExchangeRates MapToDto(this ExchangeRatesRequest exchangeRates)
         {
@@ -15,7 +15,7 @@ namespace CurrencyExchange.Application.Mappers
         }*/
         public static ExchangeRatesWithAmount MapToDtoExchange(this ExchangeRates exchangeRates, decimal amount, Func<decimal, decimal, decimal> exchangeAction)
         {
-            return new ExchangeRatesWithAmount(exchangeRates.BaseCurrency, exchangeRates.TargetCurrency, exchangeRates.Rate, amount, exchangeAction(amount, exchangeRates.Rate));
+            return new ExchangeRatesWithAmount(exchangeRates.BaseCurrency.MapToDto(), exchangeRates.TargetCurrency.MapToDto(), exchangeRates.Rate, amount, exchangeAction(amount, exchangeRates.Rate));
         }
     }
 }

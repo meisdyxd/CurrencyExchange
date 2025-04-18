@@ -1,4 +1,4 @@
-﻿namespace CurrencyExchange.Application.DTOs.ExchangeRatesDTOs
+namespace CurrencyExchange.Application.DTOs.ExchangeRatesDTOs
 {
-    public record ExchangeRatesRequest(string baseCurrencyCode, string targetCurrencyCode, decimal rate);
+    public record ExchangeRatesRequest(string BaseCurrencyCode, string TargetCurrencyCode, decimal Rate);
 }

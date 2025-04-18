@@ -21,8 +21,8 @@ namespace CurrencyExchange.Domain.Models
         /// </summary>
         public decimal Rate {  get; private set; }
 
-        public Currency BaseCurrency { get; private set; } = null!;
-        public Currency TargetCurrency { get; private set; } = null!;
+        public Currency BaseCurrency { get; set; }
+        public Currency TargetCurrency { get; set; }
 
         /// <summary>
         /// Конструктор курса обмена

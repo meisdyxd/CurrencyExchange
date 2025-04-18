@@ -20,15 +20,13 @@ namespace CurrencyExchange.Persistence.AppDbContext.Configurations
 
             builder.Property(c => c.Sign).HasMaxLength(8);
 
-            builder.HasMany(c => c.ExchangeRates)
+            builder.HasMany(c => c.BaseCurrencyRates)
                 .WithOne(r => r.BaseCurrency)
-                .HasForeignKey(r => r.BaseCurrencyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(r => r.BaseCurrencyId);
 
-            builder.HasMany(c => c.ExchangeRates)
+            builder.HasMany(c => c.TargetCurrencyRates)
                 .WithOne(r => r.TargetCurrency)
-                .HasForeignKey(r => r.TargetCurrencyId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(r => r.TargetCurrencyId);
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using CurrencyExchange.Application.Interfaces;
+using CurrencyExchange.Application.Interfaces;
 using CurrencyExchange.Application.Services;
-using FluentValidation;
+using CurrencyExchange.Application.Validators;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CurrencyExchange.Application
@@ -12,7 +12,7 @@ namespace CurrencyExchange.Application
             return services
                 .AddCurrencyService()
                 .AddExchangeRatesService()
-                .AddFluentValidators();
+                .AddValidators();
         }
         private static IServiceCollection AddCurrencyService(this IServiceCollection services)
         {
@@ -21,10 +21,6 @@ namespace CurrencyExchange.Application
         private static IServiceCollection AddExchangeRatesService(this IServiceCollection services)
         {
             return services.AddScoped<IExchangeRatesService, ExchangeRatesService>();
-        }
-        private static IServiceCollection AddFluentValidators(this IServiceCollection services)
-        {
-            return services.AddValidatorsFromAssembly(typeof(RegistrationApplication).Assembly);
         }
     }
 }

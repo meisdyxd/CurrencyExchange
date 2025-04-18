@@ -1,4 +1,5 @@
-﻿using CurrencyExchange.Application.DTOs.ExchangeRatesDTOs;
+using CurrencyExchange.Application.Constants;
+using CurrencyExchange.Application.DTOs.ExchangeRatesDTOs;
 using CurrencyExchange.Application.Interfaces;
 using CurrencyExchange.Application.Mappers;
 using CurrencyExchange.Domain.Models;
@@ -13,7 +14,6 @@ namespace CurrencyExchange.Application.Services
     {
         private readonly IExchangeRatesStore _exchangeRatesStore = exchangeRatesStore;
         private readonly ICurrencyStore _currencyStore = currencyStore;
-        private readonly ILogger<ExchangeRatesService> _logger = logger;
 
         public async Task<Result<IEnumerable<ExchangeRatesResponse>>> GetAllAsync(CancellationToken cancellationToken)
         {
@@ -23,17 +23,15 @@ namespace CurrencyExchange.Application.Services
 
         public async Task<Result<ExchangeRatesResponse>> GetByCodesAsync(string codes, CancellationToken cancellationToken)
         {
-            if(codes.Length != 6)
+            if(codes.Length != ApplicationConstants.CurrencyPairLength)
             {
-                _logger.LogError("При получении курса валют, неверно задана пара код валют");
                 return Error.BadRequest("Неизвестные коды валют пары");
             }
-            var baseCurrencyCode = codes.Substring(0, 3).ToUpper();
-            var targetCurrencyCode = codes.Substring(3, 3).ToUpper();
+            var baseCurrencyCode = codes.Substring(0, ApplicationConstants.CodeLength).ToUpper();
+            var targetCurrencyCode = codes.Substring(3, ApplicationConstants.CodeLength).ToUpper();
             var result = await _exchangeRatesStore.GetByCodes(baseCurrencyCode, targetCurrencyCode, cancellationToken);
             if (result is null)
             {
-                _logger.LogWarning(string.Format("Получение: Курс обмена с кодами {0} и {1} не найден", baseCurrencyCode, targetCurrencyCode));
                 return Error.NotFound(string.Format("Курс обмена с кодами {0} и {1} не найден", baseCurrencyCode, targetCurrencyCode));
             }
             return result.MapToDto();
@@ -41,41 +39,36 @@ namespace CurrencyExchange.Application.Services
         
         public async Task<Result<ExchangeRatesResponse>> AddAsync(ExchangeRatesRequest exchangeRatesRequest, CancellationToken cancellationToken)
         {
-            var baseCurrencyCode = exchangeRatesRequest.baseCurrencyCode;
-            var targetCurrencyCode = exchangeRatesRequest.targetCurrencyCode;
+            var baseCurrencyCode = exchangeRatesRequest.BaseCurrencyCode;
+            var targetCurrencyCode = exchangeRatesRequest.TargetCurrencyCode;
             var existExchangeRates = await _exchangeRatesStore.GetByCodes(baseCurrencyCode, targetCurrencyCode, cancellationToken);
             if (existExchangeRates is not null)
             {
-                _logger.LogError(string.Format("Курс обмена валют пары с кодами {0} и {1} уже существует", baseCurrencyCode, targetCurrencyCode));
                 return Error.Conflict($"Курс обмена валют пары с кодами {baseCurrencyCode} и {targetCurrencyCode} уже существует");
             }
             var baseCurrency = await _currencyStore.GetByCode(baseCurrencyCode, cancellationToken);
             if (baseCurrency is null)
             {
-                _logger.LogError(string.Format("Добавление курса обмена: Базовой валюты с кодом {0} не существует", baseCurrencyCode));
                 return Error.BadRequest($"Базовой валюты с кодом {baseCurrencyCode} не существует");
             }
             var targetCurrency = await _currencyStore.GetByCode(targetCurrencyCode, cancellationToken);
             if (targetCurrency is null)
             {
-                _logger.LogError(string.Format("Добавление курса обмена: Целевой валюты с кодом {0} не существует", targetCurrencyCode));
                 return Error.BadRequest($"Целевой валюты с кодом {targetCurrencyCode} не существует");
             }
-            var newExchangeRates = new ExchangeRates(baseCurrency.Id, targetCurrency.Id, exchangeRatesRequest.rate);
+            var newExchangeRates = new ExchangeRates(baseCurrency.Id, targetCurrency.Id, exchangeRatesRequest.Rate);
             await _exchangeRatesStore.Add(newExchangeRates, cancellationToken);
-            return new ExchangeRatesResponse(newExchangeRates.Id, baseCurrency, targetCurrency, newExchangeRates.Rate);
+            return new ExchangeRatesResponse(newExchangeRates.Id, baseCurrency.MapToDto(), targetCurrency.MapToDto(), newExchangeRates.Rate);
         }
 
         public async Task<Result<ExchangeRatesResponse>> UpdateRateAsync(string codes, decimal rate, CancellationToken cancellationToken)
         {
-            if (codes.Length != 6)
+            if (codes.Length != ApplicationConstants.CurrencyPairLength)
             {
-                _logger.LogError("При получении курса валют, неверно задана пара код валют");
                 return Error.BadRequest("Неизвестные коды валют пары");
             }
-            if (rate < 0)
+            if (rate < ApplicationConstants.MinimalRate)
             {
-                _logger.LogError("При обновлении курс был указан <= 0");
                 return Error.BadRequest("Курс обмена валют должен быть больше 0");
             }
             var baseCurrencyCode = codes.Substring(0, 3).ToUpper();
@@ -83,7 +76,6 @@ namespace CurrencyExchange.Application.Services
             var existExchangeRate = await _exchangeRatesStore.GetByCodes(baseCurrencyCode, targetCurrencyCode, cancellationToken);
             if (existExchangeRate is null)
             {
-                _logger.LogWarning(string.Format("Получение: Курс обмена с кодами {0} и {1} не найден", baseCurrencyCode, targetCurrencyCode));
                 return Error.NotFound(string.Format("Курс обмена с кодами {0} и {1} не найден", baseCurrencyCode, targetCurrencyCode));
             }
             var updatedExchangeRate = await _exchangeRatesStore.Update(baseCurrencyCode, targetCurrencyCode, rate, cancellationToken);

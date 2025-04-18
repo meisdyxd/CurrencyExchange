@@ -1,4 +1,4 @@
-﻿using ResultSharp.Errors;
+using ResultSharp.Errors;
 
 namespace CurrencyExchange.Domain.Models
 {
@@ -24,9 +24,10 @@ namespace CurrencyExchange.Domain.Models
         /// </summary>
         public string Sign { get; private set; }
 
-        public List<ExchangeRates> ExchangeRates { get; private set; } = new();
+        public List<ExchangeRates> BaseCurrencyRates { get; set; }
+        public List<ExchangeRates> TargetCurrencyRates { get; set; }
 
-        
+
         /// <summary>
         /// Конструктор валюты
         /// </summary>

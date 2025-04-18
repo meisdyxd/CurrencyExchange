@@ -7,8 +7,8 @@ namespace CurrencyExchange.Persistence.AppDbContext.Extensions
     {
         public static ModelBuilder ApplyAllConfigurations(this ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyCurrencyConfiguration()
-                .ApplyExchangeRatesConfiguration();
+            modelBuilder.ApplyExchangeRatesConfiguration()
+                .ApplyCurrencyConfiguration();
             return modelBuilder;
         }
         private static ModelBuilder ApplyCurrencyConfiguration(this ModelBuilder modelBuilder)
